@@ -47,6 +47,14 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+## Publicar la versión estática en GitHub Pages
+
+La carpeta `site/` contiene una versión que procesa los cuatro Excel en el navegador. No requiere ejecutar Python ni envía los archivos cargados a un servidor. La biblioteca para leer y escribir Excel se descarga desde jsDelivr, por lo que el navegador necesita conexión a internet.
+
+Para activar GitHub Pages, en el repositorio abre **Settings → Pages** y selecciona **GitHub Actions** como origen. Después de guardar cambios en `site/` y subirlos a la rama `main`, el workflow `.github/workflows/pages.yml` publicará la página. El enlace aparecerá en **Settings → Pages** y en la ejecución del workflow.
+
+El feedback de esta versión queda guardado únicamente en el almacenamiento local del navegador y del equipo usados. No se comparte entre usuarios ni dispositivos. Usa **Exportar respaldo feedback (.json)** e **Importar respaldo feedback (.json)** para conservarlo o trasladarlo manualmente. La versión Streamlit original continúa disponible mediante `app.py`.
+
 ## Nota sobre persistencia
 
-El prototipo guarda el seguimiento OWS en `feedback_ows.json` dentro de la carpeta del proyecto. Si se despliega en un servidor, conviene reemplazarlo por SQLite o una base de datos persistente.
+La versión Streamlit guarda el seguimiento OWS en `feedback_ows.json` dentro de la carpeta del proyecto. La versión estática de GitHub Pages guarda el feedback solo en el almacenamiento local del navegador; no lo comparte con otros usuarios o dispositivos.

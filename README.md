@@ -51,9 +51,11 @@ streamlit run app.py
 
 La carpeta `site/` contiene una versión que procesa los cuatro Excel en el navegador. No requiere ejecutar Python ni envía los archivos cargados a un servidor. La biblioteca para leer y escribir Excel se descarga desde jsDelivr, por lo que el navegador necesita conexión a internet.
 
+**Aplicación publicada:** https://maria-tovarp.github.io/Control-de-Rechazos-FME/
+
 Para activar GitHub Pages, en el repositorio abre **Settings → Pages** y selecciona **GitHub Actions** como origen. Después de guardar cambios en `site/` y subirlos a la rama `main`, el workflow `.github/workflows/pages.yml` publicará la página. El enlace aparecerá en **Settings → Pages** y en la ejecución del workflow.
 
-El feedback de esta versión queda guardado únicamente en el almacenamiento local del navegador y del equipo usados. No se comparte entre usuarios ni dispositivos. Usa **Exportar respaldo feedback (.json)** e **Importar respaldo feedback (.json)** para conservarlo o trasladarlo manualmente. La versión Streamlit original continúa disponible mediante `app.py`.
+El repositorio y la página son públicos. El feedback de esta versión queda guardado únicamente en el almacenamiento local del navegador y del equipo usados. No se comparte entre usuarios ni dispositivos. Usa **Exportar respaldo feedback (.json)** e **Importar respaldo feedback (.json)** para conservarlo o trasladarlo manualmente. La versión Streamlit original continúa disponible mediante `app.py`.
 
 ## Nota sobre persistencia
 

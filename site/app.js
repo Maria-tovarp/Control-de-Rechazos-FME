@@ -322,7 +322,8 @@
   }
 
   function renderTable(table, headers, rows) {
-    table.innerHTML = `<thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${headers.map((header) => `<td>${escapeHtml(row[header])}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    const columnClass = (header) => `col-${String(header).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+    table.innerHTML = `<thead><tr>${headers.map((header) => `<th class="${columnClass(header)}">${escapeHtml(header)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${headers.map((header) => `<td class="${columnClass(header)}">${escapeHtml(row[header])}</td>`).join("")}</tr>`).join("")}</tbody>`;
   }
 
   function setOptions(select, values, first = null, preserve = false) {
@@ -393,14 +394,26 @@
       return;
     }
     container.innerHTML = state.messages.map((item, index) => `<article class="message-card">
-      <div class="message-head"><strong>${escapeHtml(item.FME)} · ${item["Cantidad rechazos"]} rechazo(s) · ${escapeHtml(item.Coordinador)}</strong><span>${escapeHtml(item.Sitios)}</span></div>
+      <button class="message-head message-toggle" type="button" aria-expanded="false" aria-controls="message-details-${index}">
+        <span class="message-summary"><strong>${escapeHtml(item.FME)}</strong><small>${item["Cantidad rechazos"]} rechazo(s) · ${escapeHtml(item.Coordinador)}</small></span>
+        <span class="message-site">${escapeHtml(item.Sitios)}</span><span class="message-chevron" aria-hidden="true"></span>
+      </button>
+      <div class="message-details" id="message-details-${index}" hidden>
       <div class="message-fields">
         <label>Celular FME<input readonly value="${escapeHtml(item["Celular visible"] || "No encontrado")}"></label>
         <label>Origen celular<input readonly value="${escapeHtml(item["Origen celular"])}"></label>
         ${item["WhatsApp URL"] ? `<a class="button primary" href="${escapeHtml(item["WhatsApp URL"])}" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a>` : "<span class=\"muted\">Sin celular</span>"}
       </div>
       <label>Mensaje listo para copiar<textarea rows="8" id="message-${index}">${escapeHtml(item.Mensaje)}</textarea></label>
+      </div>
     </article>`).join("");
+    container.querySelectorAll(".message-toggle").forEach((button) => button.addEventListener("click", () => {
+      const details = $(button.getAttribute("aria-controls"));
+      const open = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!open));
+      details.hidden = open;
+      button.closest(".message-card").classList.toggle("is-open", !open);
+    }));
   }
 
   function renderFeedbackOptions() {
@@ -444,10 +457,10 @@
     if (previous && rows.some(({ index }) => String(index) === previous)) select.value = previous;
     if (!rows.length) {
       $("closed-details").innerHTML = '<p class="notice visible success">No hay actividades Closed rechazadas en este periodo.</p>';
-      ["close-date", "email-to", "email-cc", "email-subject", "email-body", "download-email"].forEach((id) => { $(id).disabled = true; });
+      ["close-date", "email-to", "email-cc", "email-subject", "email-body", "open-outlook", "download-email"].forEach((id) => { $(id).disabled = true; });
       return;
     }
-    ["close-date", "email-to", "email-cc", "email-subject", "email-body", "download-email"].forEach((id) => { $(id).disabled = false; });
+    ["close-date", "email-to", "email-cc", "email-subject", "email-body", "open-outlook", "download-email"].forEach((id) => { $(id).disabled = false; });
     if (!$("close-date").value) $("close-date").value = dateInputLocal(new Date());
     $("email-to").value = TO_RECIPIENTS.join("; ");
     $("email-cc").value = CC_RECIPIENTS.join("; ");
@@ -564,6 +577,23 @@
 
   function emlValue(value) {
     return norm(value).replace(/\r?\n/g, "\r\n").replace(/^[.]/gm, "..");
+  }
+
+  function emailAddresses(value) {
+    return norm(value).split(";").map((entry) => {
+      const match = entry.match(/<([^>]+)>/);
+      return (match ? match[1] : entry).trim();
+    }).filter(Boolean).join(";");
+  }
+
+  function openOutlookComposer() {
+    const parameters = new URLSearchParams({
+      to: emailAddresses($("email-to").value),
+      cc: emailAddresses($("email-cc").value),
+      subject: $("email-subject").value,
+      body: $("email-body").value,
+    });
+    window.open(`https://outlook.office.com/mail/deeplink/compose?${parameters.toString()}`, "_blank", "noopener");
   }
 
   function downloadEml() {
@@ -704,6 +734,7 @@
     $("delete-feedback").addEventListener("click", deleteCurrentFeedback);
     $("closed-activity").addEventListener("change", renderClosedEmail);
     ["close-date", "close-time"].forEach((id) => $(id).addEventListener("change", renderClosedEmail));
+    $("open-outlook").addEventListener("click", openOutlookComposer);
     $("download-email").addEventListener("click", downloadEml);
     $("download-xlsx").addEventListener("click", () => { try { writeOutputWorkbook(); } catch (error) { setNotice(`No se pudo exportar el Excel: ${error.message}`, "error"); } });
     $("download-csv").addEventListener("click", downloadMessagesCsv);

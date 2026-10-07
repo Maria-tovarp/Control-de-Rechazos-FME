@@ -347,10 +347,10 @@
     const scope = $("filter-scope").value;
     return state.rows.filter((row) => {
       if (!ignoreCoordinator && coordinator !== "Todos" && row.Coordinador !== coordinator) return false;
-      if (fmes.length && !fmes.includes(row["FME ID"])) return false;
-      if (sites.length && !sites.includes(row["Site ID"])) return false;
-      if (taskStatuses.length && !taskStatuses.includes(row["Task status"])) return false;
-      if (owsStatuses.length && !owsStatuses.includes(row["Estado OWS"])) return false;
+      if (fmes.length && !fmes.includes("Todos") && !fmes.includes(row["FME ID"])) return false;
+      if (sites.length && !sites.includes("Todos") && !sites.includes(row["Site ID"])) return false;
+      if (taskStatuses.length && !taskStatuses.includes("Todos") && !taskStatuses.includes(row["Task status"])) return false;
+      if (owsStatuses.length && !owsStatuses.includes("Todos") && !owsStatuses.includes(row["Estado OWS"])) return false;
       if (scope === "Sin feedback" && hasFeedback(row)) return false;
       if (scope === "Con feedback" && !hasFeedback(row)) return false;
       if (scope === "Solo nuevos" && row["Es nuevo"] !== "Sí") return false;
@@ -513,7 +513,8 @@
     renderMetrics();
     const unique = (field) => [...new Set(state.rows.map((row) => row[field]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es"));
     setOptions($("filter-coordinator"), unique("Coordinador"), "Todos", true);
-    [["filter-fme", "FME ID"], ["filter-site", "Site ID"], ["filter-task-status", "Task status"], ["filter-ows-status", "Estado OWS"]].forEach(([id, field]) => setOptions($(id), unique(field), null, true));
+    [["filter-fme", "FME ID"], ["filter-site", "Site ID"]].forEach(([id, field]) => setOptions($(id), unique(field), "Todos", true));
+    [["filter-task-status", "Task status"], ["filter-ows-status", "Estado OWS"]].forEach(([id, field]) => setOptions($(id), unique(field), "Todos", true));
     renderDashboard();
     renderRejections();
     renderMessages();

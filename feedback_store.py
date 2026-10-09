@@ -17,9 +17,25 @@ def load_feedbacks() -> Dict[str, dict]:
         return {}
 
 
-def save_feedback(key: str, fecha: str, estado: str, feedback: str) -> None:
+def save_feedback(
+    key: str,
+    fecha: str,
+    estado: str,
+    feedback: str,
+    *,
+    task_id: str = "",
+    assignment_id: str = "",
+    site_id: str = "",
+    fme_id: str = "",
+    coordinador: str = "",
+) -> None:
     data = load_feedbacks()
     data[str(key)] = {
+        "task_id": task_id,
+        "assignment_id": assignment_id,
+        "site_id": site_id,
+        "fme_id": fme_id,
+        "coordinador": coordinador,
         "fecha": fecha,
         "estado": estado,
         "feedback": feedback,

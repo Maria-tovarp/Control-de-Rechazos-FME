@@ -512,6 +512,7 @@ def group_messages(rows: List[dict]) -> List[dict]:
             + "\n\nPor favor realizar las correcciones indicadas y confirmar cuando queden gestionadas. Gracias."
         )
         phone = next((r.get("Celular FME", "") for r in items if r.get("Celular FME")), "")
+        contact_keys = [norm(r.get("Assignment ID") or r.get("Task ID")) for r in items]
         result.append({
             "Coordinador": items[0].get("Coordinador", "Por validar"),
             "FME": fme,
@@ -519,6 +520,7 @@ def group_messages(rows: List[dict]) -> List[dict]:
             "Sitios": ", ".join(sorted({r.get('Site ID','') for r in items if r.get('Site ID')})),
             "Mensaje": message,
             "Estado contacto": "Pendiente",
+            "Claves contacto": [key for key in contact_keys if key],
             "Celular FME": phone,
             "Celular visible": phone[2:] if phone.startswith("57") and len(phone) == 12 else phone,
             "WhatsApp URL": whatsapp_url(phone, message),
